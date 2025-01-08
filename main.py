@@ -12,7 +12,7 @@ from utilities.ChangeAPI import switch_API
 load_dotenv(dotenv_path=".env")
 groq_api = "API1"
 api_key = os.environ.get(groq_api)
-TOKEN = os.environ.get("TOKEN_lora")
+TOKEN = os.environ.get("TOKEN")
 
 
 # Instructions for the bot's behavior

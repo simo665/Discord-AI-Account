@@ -4,4 +4,4 @@ __pycache__/
 .env
 
 # Text files
-requirements.txt
+configs/instructions.txt
