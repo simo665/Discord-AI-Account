@@ -8,6 +8,7 @@ from discord.ext import commands
 import time
 from collections import deque
 from utilities.ChangeAPI import switch_API
+from utilities.help import help_message
 
 load_dotenv(dotenv_path=".env")
 groq_api = "API1"
@@ -144,12 +145,24 @@ class MyClient(discord.Client):
     async def on_message(self, message):
         global message_queue
         # Check if the message not from the self-bot and check if acceptable channel.
-        if message.author == self.user or message.channel.id not in map(int, accepted_channels):
-            if message.content.startswith("_ _"):
-                accepted_channels.append(str(message.channel.id))
-                print("Channel added!")
-            return
-
+        if message.author == self.user:
+            # Help 
+            if message.content.startswith("!help"):
+                await message.channel.send(help_message)
+                return 
+            # Add channel 
+            if message.content.startswith("!a")
+                if message.channel.id not in map(int, accepted_channels):
+                    accepted_channels.append(str(message.channel.id))
+                    print("Channel added!")
+                return
+            # Remove channel 
+            if message.content.startswith("!r"):
+                if message.channel.id in map(int, accepted_channels):
+                    ccepted_channels.remove(str(message.channel.id))
+                    print("Channel removed!")
+                    return 
+            return 
         # Ensure the bot is mentioned in public channels
         if not isinstance(message.channel, discord.DMChannel) and self.user not in message.mentions:
             return
