@@ -2,3 +2,6 @@ __pycache__/
 
 # Environment 
 .env
+
+# Text files
+requirements.txt
