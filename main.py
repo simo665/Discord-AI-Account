@@ -17,7 +17,7 @@ TOKEN = os.environ.get("TOKEN_lora")
 
 # Instructions for the bot's behavior
 instructions = ""
-file_path = "configs/instructions_lora.txt"
+file_path = "configs/instructions.txt"
 if os.path.exists(file_path):
     with open(file_path, "r", encoding="utf-8") as file:
         instructions = file.read()
