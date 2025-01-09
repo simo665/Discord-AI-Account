@@ -14,7 +14,8 @@ load_dotenv(dotenv_path=".env")
 groq_api = "API1"
 api_key = os.environ.get(groq_api)
 TOKEN = os.environ.get("TOKEN")
-
+prefix = "!"
+bot = commands.Bot(command_prefix=prefix, help_command=None)
 
 # Instructions for the bot's behavior
 instructions = ""
@@ -31,7 +32,8 @@ else:
 groq_model =  "llama-3.3-70b-versatile"
 channel_context = {}  # Stores recent messages for each channel
 channel_models = {}  # Stores assigned models for each channel
-accepted_channels = []
+accepted_channels = [] # The only channels where the AI self-bot will respond 
+blocked_users = [] # Blocked user will be ignored by the ai. 
 short_memory = {} # temporary memory 
 messages_limit = 20 # After how many message the old messages will start deleting from "short_memory" ?
 
@@ -144,25 +146,38 @@ class MyClient(discord.Client):
 
     async def on_message(self, message):
         global message_queue
+        # Check if it's a command 
+        if message.content.startswith("!"):
+            try:
+                await bot.process_commands(message)
+                print("command detected")
+            except Exception as e:
+                print(f"Error processing the command: ", e)
+            return
         # Check if the message not from the self-bot and check if acceptable channel.
         if message.author == self.user:
             # Help 
             if message.content.startswith("!help"):
                 await message.channel.send(help_message)
                 return 
-            # Add channel 
-            if message.content.startswith("!a")
-                if message.channel.id not in map(int, accepted_channels):
-                    accepted_channels.append(str(message.channel.id))
-                    print("Channel added!")
-                return
             # Remove channel 
             if message.content.startswith("!r"):
                 if message.channel.id in map(int, accepted_channels):
                     ccepted_channels.remove(str(message.channel.id))
                     print("Channel removed!")
                     return 
+            # block user 
+            if message.content.startswith("!block"):
+                if message.channel.id in map(int, accepted_channels):
+                    ccepted_channels.remove(str(message.channel.id))
+                    print("Channel removed!")
+                    return 
             return 
+        # Check if it's a command 
+        if message.content.startswith(prefix):
+            await bot.process_commands(message)
+            return
+          
         # Ensure the bot is mentioned in public channels
         if not isinstance(message.channel, discord.DMChannel) and self.user not in message.mentions:
             return
@@ -171,5 +186,14 @@ class MyClient(discord.Client):
         message_queue.append(message)
         await process_message_queue(self)
 
-client = MyClient()
-client.run(TOKEN)
+async def load_cogs():
+    # Load all cogs in the "cogs" directory
+    for filename in os.listdir("./cogs"):
+        if filename.endswith(".py"):
+            await bot.load_extension(f"cogs.{filename[:-3]}")
+ 
+ 
+if __name__ == "__main__":
+    client = MyClient()
+    asyncio.run(load_cogs())
+    asyncio.run(client.run(token=TOKEN))
