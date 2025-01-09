@@ -48,7 +48,7 @@ API3=<Groq API Key 3>  # Optional
 3. **Edit instructions (optional):**
    got to file at `configs/instructions_lora.txt` to specify the bot’s behavior.
 
-
+ 
 #### 4. **Running the Bot**
 To start the bot, follow these steps:
 0. **Open a Terminal or Command Prompt**
