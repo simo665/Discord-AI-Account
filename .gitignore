@@ -2,6 +2,8 @@ __pycache__/
 
 # Environment 
 .env
+venv/
 
-# Text files
+# Text files/save files
 configs/instructions.txt
+configs/*.json
