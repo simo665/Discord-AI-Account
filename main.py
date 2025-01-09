@@ -93,14 +93,14 @@ def short_memory_limit(user_id):
 
 def generate_reply(message, bot):
     """Generates a reply using the model and context."""
-    global short_memory, groq_api
+    global short_memory, api_key
     
     client = Groq(api_key=api_key)
     context= (
       [{"role": "system", "content": instructions,}] + short_memory[message.author.id] + [{"role": "user", "content": message.content,}]
       )
     output = "" # Ai response will be saved in  this variable 
-    for i in range(5):
+    for i in range(3):
       try:     # handle api errors 
         chat_completion = client.chat.completions.create(
             messages=context,
@@ -121,7 +121,8 @@ def generate_reply(message, bot):
       except Exception as api_error:
         print(f"Groq API error: {api_error}")
         new_api = switch_API(groq_api)
-        groq_api = new_api
+        api_value = os.environ.get(new_api)
+      
     # Return response 
     return output
     
