@@ -58,17 +58,17 @@ To start the bot, follow these steps:
 ```bash
 pip install requirements.txt
 ```
-3. **Navigate to the Project Director.**
+2. **Navigate to the Project Director.**
    Use the cd command to move to the directory where your bot's code is located. For example:
 ```bash
 cd path/to/your/project
 ```
-5. **Run the Bot**
+3. **Run the Bot**
    Use the following command to start the bot:
 ```bash
 python Main.py
 ```
-7. **Verify the Bot is Running**
+4. **Verify the Bot is Running**
    If everything is set up correctly, you should see the bot log in and print a message in the terminal:
 ```bash
 Logged in as <Bot's Username>
