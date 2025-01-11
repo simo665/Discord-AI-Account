@@ -3,7 +3,7 @@ import asyncio
 from discord.ext import commands
 from main import load_accepted_channels, load_blocked_users, owner_id
 import json
-import os
+
 
 
 class Ai_Inter(commands.Cog):
@@ -19,6 +19,16 @@ class Ai_Inter(commands.Cog):
     def save_blocked_users(self):
         with open("configs/blocked_users.json", "w") as file:
             json.dump(self.blocked_users, file)
+
+
+    @commands.Cog.listener()
+    async def on_command_error(self, ctx, error):
+        prefix = self.bot.command_prefix
+        if isinstance(error, commands.CommandNotFound):
+            print(f"Oops! That command doesn't exist. Please check the available commands using `{prefix}help`.")
+        else:
+            # For other errors, you can log them or handle them differently
+            raise error
 
     @commands.command(description="Add a channel where the self-bot will interact with users.")
     async def a(self, ctx, channel_id: int = None):

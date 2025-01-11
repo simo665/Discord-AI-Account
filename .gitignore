@@ -7,3 +7,4 @@ venv/
 # Text files/save files
 configs/instructions.txt
 configs/*.json
+configs/

@@ -12,6 +12,9 @@ from utilities.help import help_message
 import json
 
 
+prefix = os.environ.get("PRE-FIX", ".")
+bot = commands.Bot(command_prefix=prefix, help_command=None)
+
 file_path = "configs/instructions.txt"
 def load_instructions():
     if os.path.exists(file_path):
@@ -43,9 +46,7 @@ load_dotenv()
 groq_api = "API1"
 api_key = os.environ.get(groq_api)
 TOKEN = os.environ.get("TOKEN")
-prefix = os.environ.get("PRE-FIX", ".")
 owner_id = os.environ.get("OWNER_ID", 0)  # without owner id you can't execute some commands that can only be used by the owner.
-bot = commands.Bot(command_prefix=prefix, help_command=None)
 
 
 # Instructions for the bot's behavior
@@ -136,9 +137,8 @@ async def process_message_queue(client):
     processing = True
     while message_queue:
         message = message_queue.popleft()
-        await asyncio.sleep(random.uniform(5, 10))
+        await asyncio.sleep(random.uniform(5, 15))
         await handle_message(client, message)
-        await asyncio.sleep(random.uniform(1, 2))  # Delay between responses
     processing = False
 
 async def handle_message(client, message):
@@ -155,7 +155,7 @@ async def handle_message(client, message):
       reply = generate_reply(message=message, bot=client)
       if not reply:
         return 
-      await asyncio.sleep(random.uniform(3, 8))
+      await asyncio.sleep(random.uniform(5, 15))
       try:
         if isinstance(message.channel, discord.DMChannel):
           await message.channel.send(reply)
@@ -182,9 +182,12 @@ async def on_message(message):
     
     # Check if it's a command 
     if message.content.startswith(prefix):
-        await bot.process_commands(message)
-        print("command detected")
-        return 
+        try:
+            await bot.process_commands(message)
+            print("command detected")
+            return 
+        except Exception as e:
+            print(e)
     
     # Check if the message not from the self-bot and check if acceptable channel.
     if message.author == bot.user:
