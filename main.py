@@ -41,6 +41,29 @@ def load_blocked_users():
     except FileNotFoundError:
         return []  # Return an empty list if the file does not exists
         
+
+def load_conversation_history():
+    file_path = "user/conversations.json"
+    try:
+        if os.path.exists(file_path):
+            # load file 
+            with open(file_path, "r") as f:
+                data = json.load(f)
+                return data
+        else:
+            return {}
+    except Exception as e:
+        print(f"Error loading contact: {e}")
+        
+def save_conversation_history():
+    file = "user/conversations.json"
+    os.makedirs("user", exist_ok=True)
+    try:
+        with open(file, "w") as f:
+            json.dump(short_memory, f, indent=2)
+    except Exception as e:
+        print(f"Error saving contact: {e}")
+        
 # Requirements 
 load_dotenv()
 groq_api = "API1"
@@ -59,7 +82,7 @@ channel_context = {}  # Stores recent messages for each channel
 channel_models = {}  # Stores assigned models for each channel
 accepted_channels = load_accepted_channels() # The only channels where the AI self-bot will respond 
 blocked_users = load_blocked_users() # Blocked user will be ignored by the ai. 
-short_memory = {} # temporary memory 
+short_memory = load_conversation_history() # temporary memory 
 messages_limit = 20 # After how many message the old messages will start deleting from "short_memory" ?
 # words that the bot will respond to even if it not being mentioned 
 engage_keywords = os.environ.get("ENGAGE_KEYWORDS", "").split(",")
@@ -115,6 +138,7 @@ def generate_reply(message, bot):
           short_memory_limit(message.author.id)
           short_memory[message.author.id].append({"role": "user", "content": message.content})
           short_memory[message.author.id].append({"role": "assistant", "content": output})
+          save_conversation_history()
         except Exception as e:
           print(f"Saving conversation in short memory error: {e}")
         # break the loop

@@ -8,3 +8,5 @@ venv/
 configs/instructions.txt
 configs/*.json
 configs/
+# users data 
+user/
