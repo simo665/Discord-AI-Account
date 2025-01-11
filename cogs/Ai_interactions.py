@@ -26,9 +26,6 @@ class Ai_Inter(commands.Cog):
         prefix = self.bot.command_prefix
         if isinstance(error, commands.CommandNotFound):
             print(f"Oops! That command doesn't exist. Please check the available commands using `{prefix}help`.")
-        else:
-            # For other errors, you can log them or handle them differently
-            raise error
 
     @commands.command(description="Add a channel where the self-bot will interact with users.")
     async def a(self, ctx, channel_id: int = None):
