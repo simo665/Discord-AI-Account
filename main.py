@@ -91,6 +91,15 @@ message_queue = deque()
 processing = False  # Flag to indicate if the queue is being processed
 
 
+def save_accepted_channels():
+    with open("configs/accepted_channels.json", "w") as file:
+        json.dump(accepted_channels, file)
+        
+def save_blocked_users():
+    with open("configs/blocked_users.json", "w") as file:
+        json.dump(blocked_users, file)
+
+
 
 
 async def load_context(message_obj, bot_name, limit=15):
@@ -165,6 +174,37 @@ async def process_message_queue(client):
         await handle_message(client, message)
     processing = False
 
+
+def process_selfbot_commands(message):
+    if message.content == ".a":
+        accepted_channels = load_accepted_channels()
+        # if a channel id provided 
+        channel_id = message.channel.id
+        if channel_id:
+             # Check if it's already in the list
+            if str(channel_id) in accepted_channels:
+                print(" • Channel id is already in the accepted channels list")
+                return 
+            # Append channel id
+            accepted_channels.append(str(channel_id))
+            save_accepted_channels()
+            print(" • Channel id is added successfully!")
+            return
+    if message.content == ".r":
+        accepted_channels = load_accepted_channels()
+        # if a channel id provided 
+        channel_id = message.channel.id
+        if channel_id:
+             # Check if it's already in the list
+            if not str(channel_id) in accepted_channels:
+                print(" • Channel id is not in the accepted channels list to be removed.")
+                return 
+            # Append channel id
+            accepted_channels.remove(str(channel_id))
+            save_accepted_channels()
+            print(" • Channel was removed successfully!")
+            return
+
 async def handle_message(client, message):
   """Handles an individual message."""
   try:
@@ -207,6 +247,9 @@ async def on_message(message):
     # Check if it's a command 
     if message.content.startswith(prefix):
         try:
+            if message.author == bot.user:
+                process_selfbot_commands(message)
+                return 
             await bot.process_commands(message)
             print("command detected")
             return 

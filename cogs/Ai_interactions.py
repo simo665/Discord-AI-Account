@@ -3,12 +3,16 @@ import asyncio
 from discord.ext import commands
 from main import load_accepted_channels, load_blocked_users, owner_id
 import json
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
 
 
 class Ai_Inter(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.owner = os.getenv("OWNER_ID")
         self.accepted_channels = []
         self.blocked_users = []
         
@@ -19,8 +23,38 @@ class Ai_Inter(commands.Cog):
     def save_blocked_users(self):
         with open("configs/blocked_users.json", "w") as file:
             json.dump(self.blocked_users, file)
-
-
+            
+    @classmethod
+    def process_selfbot_commands(message):
+        if message.content == ".a":
+            self.accepted_channels = load_accepted_channels()
+            # if a channel id provided 
+            channel_id = message.channel.id
+            if channel_id:
+                 # Check if it's already in the list
+                if str(channel_id) in self.accepted_channels:
+                    print(" • Channel id is already in the accepted channels list")
+                    return 
+                # Append channel id
+                self.accepted_channels.append(str(channel_id))
+                self.save_accepted_channels()
+                print(" • Channel id is added successfully!")
+                return
+        if message.content == ".r":
+            self.accepted_channels = load_accepted_channels()
+            # if a channel id provided 
+            channel_id = message.channel.id
+            if channel_id:
+                 # Check if it's already in the list
+                if not str(channel_id) in self.accepted_channels:
+                    print(" • Channel id is not in the accepted channels list to be removed.")
+                    return 
+                # Append channel id
+                self.accepted_channels.remove(str(channel_id))
+                self.save_accepted_channels()
+                print(" • Channel was removed successfully!")
+                return
+        
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         prefix = self.bot.command_prefix
@@ -29,6 +63,8 @@ class Ai_Inter(commands.Cog):
 
     @commands.command(description="Add a channel where the self-bot will interact with users.")
     async def a(self, ctx, channel_id: int = None):
+        if ctx.author.id != self.OWNER_ID or ctx.author.id != self.bot.user.id:
+            return 
         try:
             self.accepted_channels = load_accepted_channels()
             # if a channel id provided 
@@ -56,6 +92,8 @@ class Ai_Inter(commands.Cog):
             
     @commands.command(description="Remove a channel where the self-bot will interact with users.")
     async def r(self, ctx, channel_id: int = None):
+        if ctx.author.id != self.OWNER_ID or ctx.author.id != self.bot.user.id:
+            return 
         try:
             self.accepted_channels = load_accepted_channels()
             # if a channel id provided 
@@ -83,10 +121,9 @@ class Ai_Inter(commands.Cog):
             
     @commands.command(description="Block a user from interacting with the bot.")
     async def block(self, ctx, user_id: int):
-        self.blocked_users = load_blocked_users()
-        # check if it's not the bot owner 
-        if not str(ctx.author.id) == str(owner_id):
-            return
+        if ctx.author.id != self.OWNER_ID or ctx.author.id != self.bot.user.id:
+            return 
+        self.blocked_users = load_blocked_users() 
         # check if the user already blocked 
         if str(user_id) in self.blocked_users:
             print("User already blocked.")
@@ -98,10 +135,9 @@ class Ai_Inter(commands.Cog):
         
     @commands.command(description="UnBlock a user from interacting with the bot.")
     async def unblock(self, ctx, user_id: int):
+        if ctx.author.id != self.OWNER_ID or ctx.author.id != self.bot.user.id:
+            return 
         self.blocked_users = load_blocked_users()
-        # check if it's not the bot owner 
-        if not str(ctx.author.id) == str(owner_id):
-            return
         # check if the user already blocked 
         if not str(user_id) in self.blocked_users:
             print("User is not blocked.")
